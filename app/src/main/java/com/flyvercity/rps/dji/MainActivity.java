@@ -37,9 +37,8 @@ import dji.sdk.sdkmanager.DJISDKManager;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "DJIDEMO";
 
-    // TODO: extract these to some kind of permissions manager
-    public static final String FLAG_CONNECTION_CHANGE = "dji_sdk_connection_change";
 
+    // TODO: extract these to some kind of permissions manager
     private static final String[] REQUIRED_PERMISSION_LIST = new String[]{
             Manifest.permission.BLUETOOTH,
             Manifest.permission.BLUETOOTH_ADMIN,
@@ -60,7 +59,6 @@ public class MainActivity extends AppCompatActivity {
     private final AtomicBoolean isRegistrationInProgress = new AtomicBoolean(false);
     private static final int REQUEST_PERMISSION_CODE = 12345;
 
-    private static BaseProduct mProduct;
     private Handler mHandler;
 
     @Override
@@ -74,12 +72,18 @@ public class MainActivity extends AppCompatActivity {
             checkAndRequestPermissions();
         }
 
-        Button btn = (Button) findViewById(R.id.button_register);
-        btn.setOnClickListener(view -> startSDKRegistration());
+        Button register = (Button) findViewById(R.id.button_register);
+        register.setOnClickListener(view -> startSDKRegistration());
 
         //Initialize DJI SDK Manager
         mHandler = new Handler(Looper.getMainLooper());
         notifyStatusChange();
+
+        Button open = (Button) findViewById(R.id.button_open);
+        open.setOnClickListener(view -> {
+            Intent intent = new Intent(this, CameraActivity.class);
+            startActivity(intent);
+        });
     }
 
     /**
@@ -199,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private final Runnable updateRunnable = () -> {
-        Intent intent = new Intent(FLAG_CONNECTION_CHANGE);
+        Intent intent = new Intent(ApplicationContext.FLAG_CONNECTION_CHANGE);
         sendBroadcast(intent);
     };
 

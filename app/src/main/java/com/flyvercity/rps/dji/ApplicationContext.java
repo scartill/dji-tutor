@@ -7,6 +7,8 @@ import dji.sdk.base.BaseProduct;
 import dji.sdk.sdkmanager.DJISDKManager;
 
 public class ApplicationContext {
+    public static final String FLAG_CONNECTION_CHANGE = "dji_sdk_connection_change";
+
     private static ApplicationContext instance;
 
     public static ApplicationContext getInstance() {
