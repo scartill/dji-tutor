@@ -33,12 +33,13 @@ import dji.sdk.products.Aircraft;
 import dji.sdk.sdkmanager.DJISDKInitEvent;
 import dji.sdk.sdkmanager.DJISDKManager;
 
-// TODO: extract application class as here: https://github.com/DJI-Mobile-SDK-Tutorials/Android-FPVDemo/blob/master/FPVDemo/app/src/main/java/com/dji/FPVDemo/FPVDemoApplication.java
+// TODO: Extract registration to ApplicationContext
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "DJIDEMO";
 
     // TODO: extract these to some kind of permissions manager
     public static final String FLAG_CONNECTION_CHANGE = "dji_sdk_connection_change";
+
     private static final String[] REQUIRED_PERMISSION_LIST = new String[]{
             Manifest.permission.BLUETOOTH,
             Manifest.permission.BLUETOOTH_ADMIN,
@@ -210,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void refreshUI() {
-        BaseProduct mProduct = DJISDKManager.getInstance().getProduct();
+        BaseProduct mProduct = ApplicationContext.getInstance().getProductInstance();
         Button button_open = (Button) findViewById(R.id.button_open);
         TextView text_conn = (TextView) findViewById(R.id.text_connection_status);
         TextView text_product = (TextView) findViewById(R.id.text_product);
