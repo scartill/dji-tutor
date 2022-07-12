@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.flyvercity.rps.dji">
-
     <!-- Permissions and features -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -12,8 +11,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <!-- TODO: Check whether these are really required -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" /> <!-- TODO: Check whether these are really required -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -27,8 +25,6 @@
         android:name="android.hardware.usb.accessory"
         android:required="true" />
 
-    <!-- Permissions and features -->
-
     <application
         android:name=".MApplication"
         android:allowBackup="true"
@@ -36,28 +32,32 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme" >
-
+        android:theme="@style/AppTheme">
+        <activity
+            android:name=".CameraActivtity"
+            android:exported="false" />
         <!-- DJI SDK -->
         <uses-library android:name="com.android.future.usb.accessory" />
-        <uses-library android:name="org.apache.http.legacy" android:required="false" />
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
+
         <meta-data
             android:name="com.dji.sdk.API_KEY"
-            android:value="@string/application_key" />
-        <!-- DJI SDK -->
-
-        <activity android:name=".MainActivity"
-                  android:configChanges="orientation"
-                  android:screenOrientation="portrait">
+            android:value="@string/application_key" /> <!-- DJI SDK -->
+        <activity
+            android:name=".MainActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED" />
             </intent-filter>
+
             <meta-data
                 android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED"
                 android:resource="@xml/accessory_filter" />

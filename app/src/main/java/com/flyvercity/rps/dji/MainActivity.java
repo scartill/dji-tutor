@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -32,10 +31,10 @@ import dji.sdk.sdkmanager.DJISDKManager;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "DJIDEMO";
-    public static final String FLAG_CONNECTION_CHANGE = "dji_sdk_connection_change";
     private static BaseProduct mProduct;
     private Handler mHandler;
 
+    public static final String FLAG_CONNECTION_CHANGE = "dji_sdk_connection_change";
     private static final String[] REQUIRED_PERMISSION_LIST = new String[]{
             Manifest.permission.BLUETOOTH,
             Manifest.permission.BLUETOOTH_ADMIN,
@@ -66,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        Button btn = (Button) findViewById(R.id.btnReg);
+        Button btn = (Button) findViewById(R.id.button_register);
 
         btn.setOnClickListener(view -> startSDKRegistration());
 
