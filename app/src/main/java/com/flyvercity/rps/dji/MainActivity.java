@@ -1,6 +1,7 @@
 package com.flyvercity.rps.dji;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -10,12 +11,15 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import com.flyvercity.rps.dji.databinding.ActivityMainBinding;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,15 +29,15 @@ import dji.common.error.DJIError;
 import dji.common.error.DJISDKError;
 import dji.sdk.base.BaseComponent;
 import dji.sdk.base.BaseProduct;
+import dji.sdk.products.Aircraft;
 import dji.sdk.sdkmanager.DJISDKInitEvent;
 import dji.sdk.sdkmanager.DJISDKManager;
 
+// TODO: extract application class as here: https://github.com/DJI-Mobile-SDK-Tutorials/Android-FPVDemo/blob/master/FPVDemo/app/src/main/java/com/dji/FPVDemo/FPVDemoApplication.java
 public class MainActivity extends AppCompatActivity {
-
     private static final String TAG = "DJIDEMO";
-    private static BaseProduct mProduct;
-    private Handler mHandler;
 
+    // TODO: extract these to some kind of permissions manager
     public static final String FLAG_CONNECTION_CHANGE = "dji_sdk_connection_change";
     private static final String[] REQUIRED_PERMISSION_LIST = new String[]{
             Manifest.permission.BLUETOOTH,
@@ -50,27 +54,31 @@ public class MainActivity extends AppCompatActivity {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.READ_PHONE_STATE,
     };
+
     private final List<String> missingPermission = new ArrayList<>();
     private final AtomicBoolean isRegistrationInProgress = new AtomicBoolean(false);
     private static final int REQUEST_PERMISSION_CODE = 12345;
 
+    private static BaseProduct mProduct;
+    private Handler mHandler;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.activity_main);
 
         // When the compile and target version is higher than 22, please request the following permission at runtime to ensure the SDK works well.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkAndRequestPermissions();
         }
 
-        setContentView(R.layout.activity_main);
-
         Button btn = (Button) findViewById(R.id.button_register);
-
         btn.setOnClickListener(view -> startSDKRegistration());
 
         //Initialize DJI SDK Manager
         mHandler = new Handler(Looper.getMainLooper());
+        notifyStatusChange();
     }
 
     /**
@@ -121,10 +129,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startSDKRegistration() {
+        Log.d(TAG, "Start registration called");
         if (isRegistrationInProgress.compareAndSet(false, true)) {
             AsyncTask.execute(() -> {
                 showToast("Registering, please wait...");
 
+                // TODO: refactor out anonymous class
                 DJISDKManager.getInstance().registerApp(MainActivity.this.getApplicationContext(), new DJISDKManager.SDKManagerCallback() {
                     @Override
                     public void onRegister(DJIError djiError) {
@@ -132,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
                             showToast("Register Success");
                             DJISDKManager.getInstance().startConnectionToProduct();
                         } else {
-                            showToast("Register sdk fails, please check the bundle id and network connection!");
+                            showToast("Register SDK fails, please check the bundle id and network connection!");
                         }
                         Log.v(TAG, djiError.getDescription());
                     }
@@ -182,6 +192,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void notifyStatusChange() {
+        runOnUiThread(this::refreshUI);
         mHandler.removeCallbacks(updateRunnable);
         mHandler.postDelayed(updateRunnable, 500);
     }
@@ -196,5 +207,35 @@ public class MainActivity extends AppCompatActivity {
         handler.post(() -> Toast.makeText(
                 getApplicationContext(),
                 toastMsg, Toast.LENGTH_LONG).show());
+    }
+
+    private void refreshUI() {
+        BaseProduct mProduct = DJISDKManager.getInstance().getProduct();
+        Button button_open = (Button) findViewById(R.id.button_open);
+        TextView text_conn = (TextView) findViewById(R.id.text_connection_status);
+        TextView text_product = (TextView) findViewById(R.id.text_product);
+
+        if (null != mProduct && mProduct.isConnected()) {
+
+            Log.v(TAG, "refreshSDK: True");
+            button_open.setEnabled(true);
+
+            String str = mProduct instanceof Aircraft ? "DJIAircraft" : "DJIHandHeld";
+            text_conn.setText("Status: " + str + " connected");
+
+            if (null != mProduct.getModel()) {
+                text_product.setText("" + mProduct.getModel().getDisplayName());
+            } else {
+                text_product.setText("Product Information");
+            }
+
+        } else {
+
+            Log.v(TAG, "refreshSDK: False");
+            button_open.setEnabled(false);
+
+            text_product.setText("Product Information");
+            text_conn.setText("Connection Lost");
+        }
     }
 }
